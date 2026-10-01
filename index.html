@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Mattas Custos</title>
+<meta name="description" content="Controle de custos das obras da Mattas Construtora e Incorporadora.">
+<meta name="theme-color" content="#0E2A47">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icone.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+
+<!-- ======================= ENTRADA ======================= -->
+<div class="porta" id="porta">
+  <div class="porta-cartao">
+    <div class="porta-marca">
+      <b>Mattas Custos</b>
+      <span>Controle de custos das obras</span>
+    </div>
+
+    <div id="porta-corpo">
+      <p class="porta-txt">Entre com a conta Google que tem acesso à planilha.</p>
+      <button class="save" id="btn-entrar">Entrar com o Google</button>
+    </div>
+
+    <div id="porta-erro" class="porta-erro" hidden></div>
+    <div class="porta-rodape" id="porta-rodape"></div>
+  </div>
+</div>
+
+<!-- ======================= APLICATIVO ======================= -->
+<div class="shell" id="app" hidden>
+  <div class="phone">
+
+    <div class="topbar">
+      <div class="brand"><b>Mattas Custos</b><span id="brandctx"></span></div>
+      <button class="netpill" id="netpill" title="Situação da sincronização">
+        <i class="netdot"></i><span id="nettxt">sincronizado</span>
+      </button>
+    </div>
+
+    <!-- ---------------- LANÇAR ---------------- -->
+    <div class="view" id="v-lancar">
+      <div class="edbanner" id="edbanner" hidden>
+        <div class="edtxt"><b>Editando lançamento</b><span id="edquem"></span></div>
+        <button type="button" class="edcancel" id="edcancel">Cancelar</button>
+      </div>
+
+      <div class="pad">
+        <div class="seg" role="group" aria-label="Tipo de lançamento">
+          <button type="button" data-tipo="despesa" aria-pressed="true">Despesa</button>
+          <button type="button" data-tipo="receita" aria-pressed="false">Receita</button>
+          <button type="button" data-tipo="acerto" aria-pressed="false">Acerto</button>
+        </div>
+
+        <div class="field">
+          <div class="lbl"><span>Data</span><em id="datahint">hoje</em></div>
+          <div class="chips">
+            <button type="button" class="chip mini" data-dia="0" aria-pressed="true">Hoje</button>
+            <button type="button" class="chip mini" data-dia="1" aria-pressed="false">Ontem</button>
+            <button type="button" class="chip mini" data-dia="2" aria-pressed="false">Anteontem</button>
+            <input type="date" class="inp" id="data" style="width:auto;padding:6px 10px;font-size:12.5px">
+          </div>
+        </div>
+
+        <div class="amount">
+          <span class="cur">Valor em reais</span>
+          <input id="valor" inputmode="decimal" placeholder="0,00" autocomplete="off" aria-label="Valor em reais">
+        </div>
+
+        <div class="field" id="f-destinatario">
+          <div class="lbl"><span id="lblDest">Destinatário</span><em id="destnovo" class="novo" hidden>cadastro novo</em></div>
+          <input class="inp" id="destinatario" list="l-forn" placeholder="Buscar fornecedor ou digitar novo" autocomplete="off">
+          <datalist id="l-forn"></datalist>
+        </div>
+
+        <div class="field" id="f-descricao">
+          <div class="lbl"><span>Descrição</span></div>
+          <input class="inp" id="descricao" list="l-desc" placeholder="O que foi comprado ou pago" autocomplete="off">
+          <datalist id="l-desc"></datalist>
+        </div>
+
+        <div class="field cb" id="f-categoria">
+          <div class="lbl"><span>Categoria</span><em id="cathint">digite para filtrar</em></div>
+          <input class="inp" id="categoria" placeholder="Escolher categoria" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="cblist">
+          <div class="cb-list" id="cblist" hidden></div>
+        </div>
+
+        <div class="field" id="f-obra">
+          <div class="lbl"><span>Obra</span></div>
+          <div class="gchips" id="obras"></div>
+        </div>
+
+        <div class="field" id="f-pagante">
+          <div class="lbl"><span id="lblPagante">Quem pagou</span></div>
+          <div class="gchips" id="pagantes"></div>
+        </div>
+
+        <div class="field" id="f-recebedor" hidden>
+          <div class="lbl"><span>Quem recebeu</span></div>
+          <div class="gchips" id="recebedores"></div>
+        </div>
+
+        <div class="field" id="f-adm">
+          <div class="toggle">
+            <div class="t-txt">
+              <b>Incide taxa de ADM</b>
+              <span id="admhint">sugerido pela categoria — dá para mudar</span>
+            </div>
+            <button type="button" class="sw" id="adm" aria-pressed="true" aria-label="Incide taxa de ADM"></button>
+          </div>
+        </div>
+
+        <div class="field" id="f-recorrente">
+          <div class="toggle">
+            <div class="t-txt">
+              <b>Se repete todo mês</b>
+              <span id="rechint">não se repete</span>
+            </div>
+            <button type="button" class="sw" id="recorrente" aria-pressed="false" aria-label="Se repete todo mês"></button>
+          </div>
+        </div>
+
+        <div class="field" id="f-parcelado">
+          <div class="toggle">
+            <div class="t-txt">
+              <b>Compra parcelada</b>
+              <span id="parchint">à vista</span>
+            </div>
+            <button type="button" class="sw" id="parcelado" aria-pressed="false" aria-label="Compra parcelada"></button>
+          </div>
+          <div class="chips" id="f-nparc" hidden style="margin-top:8px; align-items:center">
+            <span class="hintline" style="margin:0">Número de parcelas</span>
+            <input class="inp" id="nparc" type="number" inputmode="numeric" min="2" max="60" value="2" style="width:80px;padding:6px 10px">
+          </div>
+        </div>
+
+        <div class="field" id="f-nf">
+          <div class="lbl"><span>Nota fiscal</span></div>
+          <div class="gchips" id="nf">
+            <button type="button" class="chip" data-nf="pendente" aria-pressed="true">Falta a nota</button>
+            <button type="button" class="chip" data-nf="recebida" aria-pressed="false">Já tenho</button>
+            <button type="button" class="chip" data-nf="nao_aplica" aria-pressed="false">Não vai ter</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="lbl"><span>Observação</span><em>opcional</em></div>
+          <input class="inp" id="obs" placeholder="Ex.: feriado dia 01/05, foi pago um dia a mais" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="savebar">
+        <button class="save" id="salvar" disabled>Salvar lançamento</button>
+        <div class="hintline" id="hint">Preencha o valor para salvar</div>
+      </div>
+    </div>
+
+    <!-- ---------------- TRANSAÇÕES ---------------- -->
+    <div class="view" id="v-tx" hidden>
+      <div class="txtop">
+        <div class="txsearch">
+          <input class="inp" id="busca" placeholder="Buscar destinatário ou descrição" autocomplete="off">
+          <button class="btnf" id="btnfiltros" aria-expanded="false">Filtros<span class="cnt" id="fcnt" hidden>0</span></button>
+        </div>
+        <div class="chiprow"><div class="gchips" id="filtroObra"></div></div>
+        <div class="fpanel" id="fpanel" hidden>
+          <div class="fcell"><span class="fl">Mês</span><select class="inp sm" id="f-mes"></select></div>
+          <div class="fcell"><span class="fl">Situação</span><select class="inp sm" id="f-sit"></select></div>
+          <div class="fcell"><span class="fl">Nota fiscal</span><select class="inp sm" id="f-nfsel"></select></div>
+          <div class="fcell"><span class="fl">Categoria</span><select class="inp sm" id="f-cat"></select></div>
+          <div class="fcell"><span class="fl">Pagante</span><select class="inp sm" id="f-pag"></select></div>
+          <div class="fcell"><span class="fl">Destinatário</span><select class="inp sm" id="f-dest"></select></div>
+          <button class="limpar wide" id="limpar">Limpar todos os filtros</button>
+        </div>
+      </div>
+      <div class="resumo" id="resumo"></div>
+      <div class="tx" id="txlist"></div>
+    </div>
+
+    <!-- ---------------- PAINEL ---------------- -->
+    <div class="view" id="v-painel" hidden>
+      <div class="pad">
+        <div class="kpis">
+          <div class="kpi wide"><div class="k">Custo total</div><div class="v" id="k-custo">—</div></div>
+          <div class="kpi"><div class="k" id="k-mes-l">Gasto do mês</div><div class="v" id="k-mes">—</div></div>
+          <div class="kpi"><div class="k" id="k-ant-l">Mês anterior</div><div class="v" id="k-ant">—</div></div>
+        </div>
+        <div class="hintline" id="k-var" style="text-align:left; margin-top:-8px"></div>
+
+        <div class="field">
+          <h2 class="sechead">Custo por obra</h2>
+          <div class="bars" id="barras"></div>
+        </div>
+
+        <div class="field">
+          <h2 class="sechead">Balanço entre sócios</h2>
+          <div class="bal" id="balanco"></div>
+          <div class="hintline" id="balhint" style="text-align:left"></div>
+        </div>
+
+        <div class="field">
+          <h2 class="sechead">Fechamento do mês</h2>
+          <div class="acertos" id="acertos"></div>
+          <div class="hintline" id="rec-aviso" style="text-align:left" hidden></div>
+          <div class="hintline" id="parc-aviso" style="text-align:left" hidden></div>
+          <button class="btn-sec btn-full" id="btn-recorrentes">Preencher recorrentes</button>
+          <button class="btn-sec btn-full" id="btn-parcelas">Lançar parcelas do mês</button>
+          <button class="btn-sec btn-full" id="btn-relatorio">Gerar relatório para os sócios</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------- CADASTROS ---------------- -->
+    <div class="view" id="v-cad" hidden>
+      <div class="pad">
+        <div class="cad">
+          <div class="cadhead"><b>Destinatários</b><span id="n-forn">0</span></div>
+          <div class="cadlist" id="lista-forn"></div>
+          <div class="cadadd">
+            <input class="inp" id="novo-forn" placeholder="Nome do fornecedor" autocomplete="off">
+            <button class="mais" id="add-forn" aria-label="Adicionar destinatário">+</button>
+          </div>
+        </div>
+
+        <div class="cad">
+          <div class="cadhead"><b>Categorias</b><span id="n-cat">0</span></div>
+          <div class="cadlist" id="lista-cat"></div>
+          <div class="cadadd">
+            <input class="inp" id="novo-cat" placeholder="Nome da categoria" autocomplete="off">
+            <button class="mais" id="add-cat" aria-label="Adicionar categoria">+</button>
+          </div>
+        </div>
+
+        <div class="cad">
+          <div class="cadhead"><b>Obras</b><span id="n-obra">0</span></div>
+          <div class="cadlist" id="lista-obra"></div>
+          <div class="cadadd">
+            <input class="inp" id="novo-obra" placeholder="Nome da obra" autocomplete="off">
+            <button class="mais" id="add-obra" aria-label="Adicionar obra">+</button>
+          </div>
+        </div>
+
+        <div class="cad">
+          <div class="cadhead"><b>Sócios</b><span id="n-soc">0</span></div>
+          <div class="cadlist" id="lista-soc"></div>
+          <div class="cadadd">
+            <input class="inp" id="novo-soc" placeholder="Nome do sócio" autocomplete="off">
+            <button class="mais" id="add-soc" aria-label="Adicionar sócio">+</button>
+          </div>
+        </div>
+
+        <div class="cad">
+          <div class="cadhead"><b>Este aparelho</b><span id="quem"></span></div>
+          <div class="cadlist">
+            <div class="caditem"><span id="info-lido">—</span></div>
+            <div class="caditem"><span id="info-fila">—</span></div>
+          </div>
+          <div class="cadadd" style="gap:7px">
+            <button class="btn-sec" id="btn-planilha">Abrir a planilha</button>
+            <button class="btn-sec" id="btn-sair">Sair</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <div class="scrim" id="scrim"></div>
+    <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Detalhe"></div>
+
+    <div class="tabbar" role="tablist">
+      <button class="tab" role="tab" aria-selected="true" data-view="lancar">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Lançar
+      </button>
+      <button class="tab" role="tab" aria-selected="false" data-view="tx">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Transações
+      </button>
+      <button class="tab" role="tab" aria-selected="false" data-view="painel">
+        <svg viewBox="0 0 24 24"><path d="M4 19V10M10 19V5M16 19v-6M22 19H2"/></svg>Painel
+      </button>
+      <button class="tab" role="tab" aria-selected="false" data-view="cad">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Cadastros
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="js/calculo.js"></script>
+<script src="js/dados.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

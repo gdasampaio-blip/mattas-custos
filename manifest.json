@@ -1,0 +1,15 @@
+{
+  "name": "Mattas Custos",
+  "short_name": "Mattas",
+  "description": "Controle de custos das obras da Mattas Construtora e Incorporadora.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EFEFEA",
+  "theme_color": "#0E2A47",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

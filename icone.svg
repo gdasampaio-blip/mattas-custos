@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Mattas Custos">
+  <rect width="512" height="512" rx="96" fill="#0E2A47"/>
+  <!-- tijolos: a obra -->
+  <g fill="#E8AE33">
+    <rect x="112" y="288" width="128" height="54" rx="8"/>
+    <rect x="256" y="288" width="144" height="54" rx="8"/>
+    <rect x="112" y="358" width="288" height="54" rx="8"/>
+  </g>
+  <!-- prumo: o controle -->
+  <g stroke="#F4F7FA" stroke-width="14" stroke-linecap="round" fill="none">
+    <path d="M256 104v112"/>
+  </g>
+  <path d="M256 216l44 44-44 44-44-44z" fill="#F4F7FA"/>
+</svg>
